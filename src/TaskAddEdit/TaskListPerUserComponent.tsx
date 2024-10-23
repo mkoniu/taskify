@@ -5,15 +5,34 @@ import AddViewEditTaskComponent from "./AddViewEditTaskComponent";
 
 function TaskListPerUserComponent() {
   const [tasksList, setTasksList] = React.useState<TaskModel[]>([]);
+  const [tab, setTab] = React.useState<string>("Current tasks");
+  const tabList = ["Current tasks", "Finished tasks", "All tasks"];
 
   useEffect(() => {
     getTasks();
   }, []);
 
+  useEffect(() => {
+    getTasks();
+  }, [tab]);
+
   const getTasks = async () => {
+    let filterQ = "";
+
+    if (tab === "Current tasks") {
+      filterQ = `user_id = ${localStorage.getItem(
+        "bonanza_user_id"
+      )} AND (finished IS NULL OR finished = 0)`;
+    }
+    if (tab === "Finished tasks") {
+      filterQ = `user_id = ${localStorage.getItem(
+        "bonanza_user_id"
+      )} AND (finished = 1)`;
+    }
+
     const response = await RecordController.GetRecords({
       collectionName: "tasks",
-      filter: `user_id = ${localStorage.getItem("bonanza_user_id")}`,
+      filter: filterQ,
     });
 
     if (!response.success) {
@@ -23,7 +42,7 @@ function TaskListPerUserComponent() {
 
     const data = response.data;
     if (!data || data.length === 0) {
-      alert("No tasks found");
+      setTasksList([]);
       return;
     }
 
@@ -50,7 +69,20 @@ function TaskListPerUserComponent() {
           updated: new Date(""),
         }}
       />
-      <div className="overflow-x-auto">
+      <div role="tablist" className="tabs tabs-boxed">
+        {tabList.map((tabElem) => (
+          <a
+          role="tab"
+          onClick={() => setTab(tabElem)}
+          className={`tab ${tab === tabElem ? "tab-active" : ""}`}
+          key={tabElem}
+        >
+          {tabElem}
+        </a>
+        ))}
+        
+      </div>
+      <div className="overflow-x-auto p-2 m-5 rounded-md shadow">
         <table className="table">
           {/* head */}
           <thead>
@@ -65,7 +97,7 @@ function TaskListPerUserComponent() {
           <tbody>
             {tasksList.map((task: TaskModel) => (
               <tr
-                className="hover"
+                className="hover rounded-md rounded hover:shadow transition duration-300 ease-in-out"
                 key={task.id}
                 onClick={() =>
                   document.getElementById(`my_modal_${task.id}`)?.showModal()

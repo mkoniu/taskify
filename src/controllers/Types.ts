@@ -55,6 +55,7 @@ export type TaskModel = {
   desc: string;
   user_id: number;
   priority: number;
+  finished: boolean | null;
   deadline: Date;
   created: Date;
   updated: Date;

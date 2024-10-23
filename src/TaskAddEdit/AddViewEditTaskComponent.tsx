@@ -14,9 +14,8 @@ function AddViewEditTaskComponent({ task_model }: { task_model: TaskModel }) {
     setTaskRecord(task_model);
   }, []);
 
-
   // useEffect(() => {
-  //   
+  //
   // }, [user]);
 
   const saveChanges = async () => {
@@ -55,7 +54,11 @@ function AddViewEditTaskComponent({ task_model }: { task_model: TaskModel }) {
 
     const resp = await RecordController.InsertData({
       collectionName: "tasks",
-      values: { ...taskRecord, deadline: new Date(taskRecordDate) , user_id: user.id},
+      values: {
+        ...taskRecord,
+        deadline: new Date(taskRecordDate),
+        user_id: user.id,
+      },
     });
 
     if (!resp.success) {
@@ -66,13 +69,22 @@ function AddViewEditTaskComponent({ task_model }: { task_model: TaskModel }) {
     window.location.reload();
   };
 
-  // const handleSelectUser = () => {
-  //   alert("from normal handleSelectUser " + JSON.stringify(e));
+  const deleteTask = async () => {
+    const task_id_to_delete = task_model.id;
 
-  //   //alert(JSON.stringify(e));
+    const resp = await RecordController.DeleteData({
+      collectionName: "tasks",
+      ID: task_id_to_delete,
+    });
 
-  //   setTaskRecord({ ...taskRecord, user_id: e.id });
-  // };
+    if (!resp.success) {
+      alert(resp.message);
+      return;
+    }
+
+    document.getElementById(`my_modal_${task_id_to_delete}`)?.close();
+    window.location.reload();
+  };
 
   return (
     <div>
@@ -101,7 +113,12 @@ function AddViewEditTaskComponent({ task_model }: { task_model: TaskModel }) {
             }
           />
 
-          {task_model.id === 0 && <div> {render} {user.id} - {user.username} - {user.email}</div>}
+          {task_model.id === 0 && (
+            <div>
+              {" "}
+              {render} {user.id} - {user.username} - {user.email}
+            </div>
+          )}
 
           {task_model.id !== 0 && (
             <input
@@ -147,6 +164,33 @@ function AddViewEditTaskComponent({ task_model }: { task_model: TaskModel }) {
               })
             }
           />
+
+          {task_model.id !== 0 && (
+            <div className="form-control w-52">
+              <label className="label cursor-pointer">
+                <span className="label-text">Is task finished</span>
+                <input
+                  type="checkbox"
+                  checked={
+                    taskRecord.finished !== null && taskRecord.finished
+                      ? true
+                      : false
+                  }
+                  className="toggle toggle-accent"
+                  onChange={(e) =>
+                    setTaskRecord({
+                      ...taskRecord,
+                      finished:
+                        taskRecord.finished == null || !taskRecord.finished
+                          ? true
+                          : false,
+                    })
+                  }
+                />
+              </label>
+            </div>
+          )}
+
           {task_model.id === 0 && (
             <button
               className="btn btn-outline btn-info"
@@ -156,11 +200,25 @@ function AddViewEditTaskComponent({ task_model }: { task_model: TaskModel }) {
             </button>
           )}
 
-          {task_model.id !== 0 && (
-            <button className="btn btn-outline btn-info" onClick={saveChanges}>
-              Save changes
-            </button>
-          )}
+          <div className="flex space-x-4 w-full justify-center">
+            {task_model.id !== 0 && (
+              <button
+                className="btn btn-outline btn-error w-1/2"
+                onClick={deleteTask}
+              >
+                Delte task
+              </button>
+            )}
+
+            {task_model.id !== 0 && (
+              <button
+                className="btn btn-outline btn-info w-1/2"
+                onClick={saveChanges}
+              >
+                Save changes
+              </button>
+            )}
+          </div>
         </div>
       </dialog>
     </div>

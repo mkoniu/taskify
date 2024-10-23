@@ -1,35 +1,50 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// import { useState } from 'react'
+
+import { useEffect, useState } from "react";
+import "./App.css";
+import TaskListPerUserComponent from "./TaskAddEdit/TaskListPerUserComponent";
+import Login from "./login/Login";
+import { AuthController } from "./controllers/AuthController";
+import useUserSelectComponent from "./UserSelect/UserSelectComponent";
+import { UserModel } from "./controllers/Types";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => {
+    setLoggedIn(checkIfLoggedIn());
+  }, []);
+
+  const checkIfLoggedIn = () => {
+    const user_id = Number(localStorage.getItem("bonanza_user_id"));
+    const token = localStorage.getItem("bonanza_token");
+    if (user_id == null || user_id <= 0 || token == null || token.length <= 0)
+      return false;
+    return true;
+  };
+
+  const handleLogout = async () => {
+    await AuthController.Logout();
+    window.location.reload();
+  };
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React aaaa--a</h1>
-      <div className="card bg-red-700">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      {!loggedIn && <Login></Login>}
+      {loggedIn && (
+        <div className="w-full h-full">
+          <button
+                onClick={handleLogout}
+                className="btn btn-warning "
+              >
+                Logout
+              </button>
+              <useUserSelectComponent onClose={(id: UserModel) => {console.log(id);}}/>
+          <TaskListPerUserComponent />
+        </div>
+      )}
     </>
-  )
+  );
 }
 
-export default App
+export default App;

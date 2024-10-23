@@ -5,8 +5,6 @@ import "./App.css";
 import TaskListPerUserComponent from "./TaskAddEdit/TaskListPerUserComponent";
 import Login from "./login/Login";
 import { AuthController } from "./controllers/AuthController";
-import useUserSelectComponent from "./UserSelect/UserSelectComponent";
-import { UserModel } from "./controllers/Types";
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -39,7 +37,6 @@ function App() {
               >
                 Logout
               </button>
-              <useUserSelectComponent onClose={(id: UserModel) => {console.log(id);}}/>
           <TaskListPerUserComponent />
         </div>
       )}

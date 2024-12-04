@@ -60,3 +60,9 @@ export type TaskModel = {
   created: Date;
   updated: Date;
 };
+
+export type FileInsertModel = {
+  file: any;
+  ref_id: number;
+  ref_type: string;
+};

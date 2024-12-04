@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 import { TaskModel } from "../controllers/Types";
 import { RecordController } from "../controllers/RecordController";
 import useUserSelectComponent from "../UserSelect/UserSelectComponent";
+import FileUploader from "./FileUploadComponent";
+import FileListDownloader from "./DownloadFileComponent";
 
 function AddViewEditTaskComponent({ task_model }: { task_model: TaskModel }) {
   const [taskRecord, setTaskRecord] = React.useState<TaskModel>({});
@@ -142,6 +144,14 @@ function AddViewEditTaskComponent({ task_model }: { task_model: TaskModel }) {
               onChange={(e) => setTaskRecordDate(e.target.value)}
             />
           )}
+
+          {task_model.id !== 0 && (<FileUploader task_id={task_model.id}>
+
+          </FileUploader>)
+                  
+              }
+
+          {task_model.id !== 0 && (<FileListDownloader file_id={task_model.id}/>)}
 
           <textarea
             className="textarea textarea-bordered"
